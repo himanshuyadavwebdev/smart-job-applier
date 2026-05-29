@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/authStore"
 import {
   IconBriefcase,
   IconChartBar,
+  IconLoader2,
   IconLogout,
   IconMenu,
   IconMoon,
@@ -12,13 +13,18 @@ import {
   IconUser,
   IconX,
 } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 
 export default function Navbar() {
   const { user, logout } = useAuthStore()
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <nav className="border-b bg-background/80 backdrop-blur sticky top-0 z-50">
@@ -61,7 +67,11 @@ export default function Navbar() {
               className="p-2 rounded-md hover:bg-muted transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />}
+              {mounted ? (
+                theme === "dark" ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />
+              ) : (
+                <IconLoader2 className="h-5 w-5 animate-spin" />
+              )}
             </button>
 
             {user && (
@@ -87,7 +97,11 @@ export default function Navbar() {
               className="p-2 rounded-md hover:bg-muted transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />}
+              {mounted ? (
+                theme === "dark" ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />
+              ) : (
+                <IconLoader2 className="h-5 w-5 animate-spin" />
+              )}
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
