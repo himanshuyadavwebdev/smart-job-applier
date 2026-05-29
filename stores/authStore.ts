@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/storage"
 
 interface User {
   _id: string
@@ -11,6 +12,7 @@ interface User {
 interface AuthState {
   user: User | null
   token: string | null
+  isHydrated: boolean
   setAuth: (user: User, token: string) => void
   logout: () => void
   hydrate: () => void
@@ -19,22 +21,17 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
+  isHydrated: false,
   setAuth: (user, token) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("token", token)
-    }
-    set({ user, token })
+    safeSetItem("token", token)
+    set({ user, token, isHydrated: true })
   },
   logout: () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token")
-    }
-    set({ user: null, token: null })
+    safeRemoveItem("token")
+    set({ user: null, token: null, isHydrated: true })
   },
   hydrate: () => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token")
-      set({ token })
-    }
+    const token = safeGetItem("token")
+    set({ token, isHydrated: true })
   },
 }))

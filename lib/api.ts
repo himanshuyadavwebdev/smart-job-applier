@@ -1,4 +1,5 @@
 import axios from "axios"
+import { safeGetItem } from "@/lib/storage"
 
 const api = axios.create({
   baseURL: "/api",
@@ -8,7 +9,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+  const token = safeGetItem("token")
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -20,7 +21,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token")
         window.location.href = "/login"
       }
     }
