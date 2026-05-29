@@ -19,6 +19,7 @@ export default function OnboardingPage() {
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState("")
   const [preferences, setPreferences] = useState({
     desiredRole: "",
     experienceLevel: "" as string,
@@ -31,6 +32,7 @@ export default function OnboardingPage() {
   const handleUpload = async () => {
     if (!file) return
     setUploading(true)
+    setError("")
     try {
       const formData = new FormData()
       formData.append("file", file)
@@ -40,7 +42,7 @@ export default function OnboardingPage() {
       setStep(2)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-      alert(msg || "Upload failed")
+      setError(msg || "Upload failed. Please try again.")
     } finally {
       setUploading(false)
     }
@@ -118,6 +120,12 @@ export default function OnboardingPage() {
                 {file ? file.name : "Click or drag to upload PDF / DOCX"}
               </p>
             </div>
+
+            {error && (
+              <div className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
 
             <button
               onClick={handleUpload}

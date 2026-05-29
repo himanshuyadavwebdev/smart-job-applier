@@ -36,13 +36,28 @@ export async function POST(request: Request) {
       )
     }
 
-    const classification = await classifyResume(rawText)
+    let classification: Record<string, unknown> | undefined
+    try {
+      classification = await classifyResume(rawText)
+    } catch (aiErr) {
+      console.warn("AI analysis failed:", (aiErr as Error).message)
+      classification = {
+        role: "",
+        experienceLevel: "",
+        skills: [],
+        techStack: [],
+        strengths: [],
+        missingSkills: [],
+        atsScore: 0,
+        summary: "AI analysis unavailable. Add your API key to enable resume parsing.",
+      }
+    }
 
     await Resume.updateMany({ userId: user._id }, { isActive: false })
 
     const resume = await Resume.create({
       userId: user._id,
-      fileUrl: "", // In a real app, upload to Cloudinary here
+      fileUrl: "",
       fileName: file.name,
       rawText,
       classification,
@@ -52,7 +67,9 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Resume uploaded and analyzed successfully.",
+        message: classification
+          ? "Resume uploaded and analyzed successfully."
+          : "Resume uploaded. AI analysis unavailable — add your API key for full features.",
         data: resume,
       },
       { status: 201 }
