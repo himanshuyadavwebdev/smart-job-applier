@@ -1,55 +1,36 @@
 # AGENTS.md — smart-job-applier
 
-## Project Overview
-Full-stack job application automation platform. Users upload resumes, get ATS scores, browse matched jobs, generate tailored cover letters, and auto-apply.
+## Commands
+- Use Bun as the package manager; the committed lockfile is `bun.lock`.
+- Dev server: `bun run dev` starts Next with Turbopack.
+- Production check: `bun run build`.
+- Focused verification: `bun run lint` and `bun run typecheck`.
+- Formatting: `bun run format` only writes `**/*.{ts,tsx}`; it does not format CSS, JSON, or Markdown.
+- No test runner is configured; do not claim tests ran unless you add/configure one.
 
-## Tech Stack
-- **Frontend:** React 18, Vite, Tailwind CSS, Zustand (state management)
-- **Backend:** Node.js, Express, MongoDB (Mongoose)
-- **Other:** Cloudinary (file uploads), AI/NLP services (resume parsing, matching, cover letters), Nodemailer (emails)
+## App Structure
+- This is a single Next.js App Router app, not a monorepo.
+- Route entrypoint: `app/page.tsx` renders `features/landing-page/pages/landing-page.tsx`.
+- Root layout: `app/layout.tsx` wires fonts, metadata, global CSS, and `components/theme-provider.tsx`.
+- Landing-page sections live under `features/landing-page/components/`; shared landing types/hooks/utils live beside them in `features/landing-page/`.
+- The `features/landing-page/api/` files are placeholders returning empty arrays; visible landing content is currently hard-coded in components.
 
-## Folder Structure
-```
-client/          # React frontend (Vite)
-  src/
-    api/         # Axios API wrappers (axiosInstance.js + domain APIs)
-    components/  # Reusable UI components (common/, jobs/, resume/, apply/)
-    pages/       # Route-level pages
-    store/       # Zustand stores (useAuthStore, useJobStore, etc.)
-    utils/       # Helpers (fileHelpers, formatters, scoreUtils)
-  index.html, vite.config.js, tailwind.config.js
-server/          # Express backend
-  config/        # DB, Cloudinary, env loaders
-  controllers/   # Route handlers
-  middleware/    # Auth, errorHandler, upload
-  models/        # Mongoose schemas (User, Resume, Job, Application)
-  routes/        # Express route definitions
-  services/      # Business logic (aiService, emailService, jobFetchService, etc.)
-  app.js         # Entry point
-```
+## Styling And UI
+- Tailwind CSS v4 is configured through `app/globals.css` and `@tailwindcss/postcss`; there is no `tailwind.config.*`.
+- shadcn is configured by `components.json` with style `radix-mira`, icon library `tabler`, CSS variables enabled, and aliases such as `@/components`, `@/components/ui`, and `@/lib/utils`.
+- Prefer shadcn UI components from `@/components/ui`; add new ones with the shadcn CLI instead of hand-rolling common primitives.
+- Use `@/lib/utils` `cn()` for class merging; Prettier is configured to sort Tailwind classes in `cn` and `cva` calls.
+- Use `@tabler/icons-react` for icons. Do not introduce emoji icons or inline SVGs unless a required brand asset has no Tabler equivalent.
+- Theme switching uses `next-themes` with `class` on `<html>`; `ThemeProvider` also binds the `d` key as a light/dark hotkey outside typing fields.
 
 ## Conventions
-- **Git:** Branch `main`. Commit messages in present tense (`Add feature`, not `Added feature`).
-- **Environment:** Use `.env` files; `.env.example` is provided for both `client/` and `server/`. Never commit real secrets.
-- **API:** Base URL configured via env var. Use the provided `axiosInstance.js` for all HTTP calls.
-- **Backend Pattern:** Controllers handle HTTP ↔ Services handle logic ↔ Models handle data.
-- **Frontend Pattern:** Pages compose components. Components are dumb/presentational where possible; state lives in Zustand stores.
-- **Styling:** Tailwind CSS only. No inline styles. Reuse `common/` components (Button, Modal, Badge, etc.).
-- **File naming:** PascalCase for components (`JobCard.jsx`), camelCase for utilities (`formatters.js`), kebab-case for routes if needed.
+- TypeScript is strict and uses `@/*` as an alias to the repository root.
+- Avoid `any`; model data with explicit interfaces/types in the feature area or a shared module when reused.
+- Keep feature code grouped by feature, following `features/landing-page/{components,pages,hooks,utils,api}` rather than spreading feature-specific files into global folders.
+- Prettier settings are 2 spaces, no semicolons, double quotes, trailing commas where valid, and LF line endings.
+- Client-only landing interactions use `'use client'`, `useScrollAnimation()`, `.animate-on-scroll`, and `staggerDelay()`; keep new scroll-animated sections consistent with that pattern.
 
-## Important Notes
-- `node_modules/` and `.env` files are gitignored. Always use the lockfiles (`package-lock.json`) when adding deps.
-- Resume uploads go through Cloudinary (see `server/middleware/upload.js`).
-- AI features (ATS scoring, matching, cover letters) live in `server/services/aiService.js`.
-- Auth is JWT-based; token handled in `axiosInstance.js` interceptors.
-
-## How to Run
-1. `npm install` in root, `client/`, and `server/`.
-2. Copy `.env.example` to `.env` and fill values.
-3. Root has scripts or run `server/` (Node) and `client/` (Vite) separately.
-
-## Agent Rules
-- Do not install new dependencies unless necessary; prefer built-ins or existing stack.
-- Keep components modular. If adding a new domain feature, follow existing folder patterns (`api/`, `components/<domain>/`, `store/`).
-- Always preserve `.env.example` when adding new env vars.
-- Run setup scripts (`setup.sh` / `setup.bat`) for fresh environments.
+## Skills
+- Before frontend design work, load the `frontend-design` skill from `anthropics/skills`; if missing, install with `npx skills add anthropics/skills@frontend-design -g -y`.
+- Before React/Next implementation work, load `vercel-react-best-practices` from `vercel-labs/agent-skills`; if missing, install with `npx skills add vercel-labs/agent-skills@vercel-react-best-practices -g -y`.
+- Before shadcn/UI work, load the `shadcn` skill from `shadcn/ui`; if missing, install with `bunx --bun skills add shadcn/ui -g -y`.
