@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import api from "@/lib/api"
 import Navbar from "@/components/navbar"
-import { useAuthStore } from "@/stores/authStore"
 import {
   IconCheck,
   IconLoader2,
@@ -16,7 +15,6 @@ const EXPERIENCE_LEVELS = ["Junior", "Mid", "Senior", "Lead"]
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { token, user, hydrate } = useAuthStore()
   const [step, setStep] = useState(1)
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -29,16 +27,6 @@ export default function OnboardingPage() {
     preferredLocations: "" as string,
     techStack: "" as string,
   })
-
-  useEffect(() => {
-    hydrate()
-  }, [hydrate])
-
-  useEffect(() => {
-    if (!token && typeof window !== "undefined") {
-      router.push("/login")
-    }
-  }, [token, router])
 
   const handleUpload = async () => {
     if (!file) return
@@ -92,8 +80,6 @@ export default function OnboardingPage() {
         : [...prev.jobType, type],
     }))
   }
-
-  if (!token) return null
 
   return (
     <div className="min-h-screen bg-background">

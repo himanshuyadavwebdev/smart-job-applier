@@ -31,14 +31,14 @@ export default function HomePage() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/register"
+              href="/onboarding"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity"
             >
               <IconRocket className="h-4 w-4" />
-              Get Started Free
+              Get Started
             </Link>
             <Link
-              href="/login"
+              href="/jobs"
               className="inline-flex items-center gap-2 rounded-lg border px-8 py-3 text-sm font-semibold hover:bg-muted transition-colors"
             >
               <IconSearch className="h-4 w-4" />
@@ -115,10 +115,10 @@ export default function HomePage() {
           </p>
           <div className="mt-8">
             <Link
-              href="/register"
+              href="/onboarding"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity"
             >
-              Create Free Account
+              Start Now
             </Link>
           </div>
         </div>

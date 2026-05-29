@@ -7,27 +7,19 @@ export interface AuthContext {
   user: InstanceType<typeof User>
 }
 
-export async function verifyAuth(request: Request): Promise<AuthContext> {
-  const authHeader = request.headers.get("authorization")
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new Error("Unauthorized")
+// Temporarily bypass auth — returns a demo user for all requests
+export async function verifyAuth(_request: Request): Promise<AuthContext> {
+  await connectDB()
+  let user = await User.findOne({ email: "demo@smartjobapplier.com" })
+  if (!user) {
+    user = await User.create({
+      name: "Demo User",
+      email: "demo@smartjobapplier.com",
+      passwordHash: "demo",
+      preferences: {},
+    })
   }
-
-  const token = authHeader.split(" ")[1]
-  const secret = process.env.JWT_SECRET!
-
-  try {
-    const decoded = jwt.verify(token, secret) as { userId: string }
-    await connectDB()
-    const user = await User.findById(decoded.userId)
-    if (!user) {
-      throw new Error("User not found")
-    }
-    return { userId: decoded.userId, user }
-  } catch {
-    throw new Error("Invalid token")
-  }
+  return { userId: user._id.toString(), user }
 }
 
 export function generateToken(userId: string) {

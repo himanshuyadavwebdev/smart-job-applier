@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "@/lib/api"
 import Navbar from "@/components/navbar"
-import { useAuthStore } from "@/stores/authStore"
 import {
   IconBookmark,
   IconCheck,
@@ -34,18 +33,12 @@ interface JobItem {
 }
 
 export default function JobsPage() {
-  const { token, hydrate } = useAuthStore()
   const [jobs, setJobs] = useState<JobItem[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [savingId, setSavingId] = useState<string | null>(null)
 
-  useEffect(() => {
-    hydrate()
-  }, [hydrate])
-
   const fetchJobs = async () => {
-    if (!token) return
     setLoading(true)
     try {
       const res = await api.get("/jobs")
@@ -59,7 +52,7 @@ export default function JobsPage() {
 
   useEffect(() => {
     fetchJobs()
-  }, [token])
+  }, [])
 
   const toggleSave = async (job: JobItem) => {
     setSavingId(job._id)

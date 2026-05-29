@@ -1,23 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { useAuthStore } from "@/stores/authStore"
 import {
   IconBriefcase,
-  IconChartBar,
   IconLoader2,
-  IconLogout,
   IconMenu,
   IconMoon,
   IconSun,
-  IconUser,
   IconX,
 } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore()
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -36,31 +31,15 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/jobs" className="text-sm font-medium hover:text-primary transition-colors">
-                  Jobs
-                </Link>
-                <Link href="/onboarding" className="text-sm font-medium hover:text-primary transition-colors">
-                  Preferences
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
-                  Log in
-                </Link>
-                <Link
-                  href="/register"
-                  className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
+            <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
+              Dashboard
+            </Link>
+            <Link href="/jobs" className="text-sm font-medium hover:text-primary transition-colors">
+              Jobs
+            </Link>
+            <Link href="/onboarding" className="text-sm font-medium hover:text-primary transition-colors">
+              Preferences
+            </Link>
 
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -73,22 +52,6 @@ export default function Navbar() {
                 <IconLoader2 className="h-5 w-5 animate-spin" />
               )}
             </button>
-
-            {user && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <IconUser className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm font-medium">{user.name}</span>
-                </div>
-                <button
-                  onClick={logout}
-                  className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
-                  title="Logout"
-                >
-                  <IconLogout className="h-5 w-5" />
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="flex md:hidden items-center gap-2">
@@ -116,31 +79,15 @@ export default function Navbar() {
 
       {mobileOpen && (
         <div className="md:hidden border-t px-4 py-4 space-y-3 bg-background">
-          {user ? (
-            <>
-              <Link href="/dashboard" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
-                Dashboard
-              </Link>
-              <Link href="/jobs" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
-                Jobs
-              </Link>
-              <Link href="/onboarding" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
-                Preferences
-              </Link>
-              <button onClick={() => { logout(); setMobileOpen(false) }} className="flex items-center gap-2 text-sm font-medium text-destructive">
-                <IconLogout className="h-4 w-4" /> Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
-                Log in
-              </Link>
-              <Link href="/register" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
-                Get Started
-              </Link>
-            </>
-          )}
+          <Link href="/dashboard" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
+            Dashboard
+          </Link>
+          <Link href="/jobs" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
+            Jobs
+          </Link>
+          <Link href="/onboarding" className="block text-sm font-medium" onClick={() => setMobileOpen(false)}>
+            Preferences
+          </Link>
         </div>
       )}
     </nav>

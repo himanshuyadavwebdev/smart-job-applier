@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "@/lib/api"
 import Navbar from "@/components/navbar"
-import { useAuthStore } from "@/stores/authStore"
 import {
   IconBriefcase,
   IconFileCheck,
@@ -35,17 +34,11 @@ interface Application {
 }
 
 export default function DashboardPage() {
-  const { user, token, hydrate } = useAuthStore()
   const [resume, setResume] = useState<ResumeData | null>(null)
   const [apps, setApps] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    hydrate()
-  }, [hydrate])
-
-  useEffect(() => {
-    if (!token) return
     const fetchData = async () => {
       try {
         const [rRes, aRes] = await Promise.all([
@@ -61,7 +54,7 @@ export default function DashboardPage() {
       }
     }
     fetchData()
-  }, [token])
+  }, [])
 
   const atsScore = resume?.classification?.atsScore || 0
   const role = resume?.classification?.role || "—"
@@ -73,7 +66,7 @@ export default function DashboardPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-muted-foreground mb-8">
-          Welcome back, {user?.name || "Job Seeker"}. Here is your activity at a glance.
+          Welcome back. Here is your activity at a glance.
         </p>
 
         {loading ? (
