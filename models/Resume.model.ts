@@ -17,7 +17,7 @@ const classificationSchema = new mongoose.Schema(
 const resumeSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    fileUrl: { type: String, required: true },
+    fileUrl: { type: String, default: "" },
     fileName: { type: String, default: "" },
     rawText: { type: String, default: "" },
     classification: { type: classificationSchema, default: () => ({}) },
