@@ -65,10 +65,18 @@ export default function OnboardingPage() {
           .map((s) => s.trim())
           .filter(Boolean),
       })
+
+      // Auto-trigger job find & apply after preferences are set
+      try {
+        await api.post("/smart-apply")
+      } catch {
+        // ignore auto-apply errors, still proceed to dashboard
+      }
+
       router.push("/dashboard")
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-      alert(msg || "Failed to save preferences")
+      setError(msg || "Failed to save preferences")
     } finally {
       setSaving(false)
     }

@@ -10,6 +10,7 @@ import {
   IconLoader2,
   IconMail,
   IconPlus,
+  IconRocket,
   IconSparkles,
   IconUpload,
 } from "@tabler/icons-react"
@@ -37,24 +38,45 @@ export default function DashboardPage() {
   const [resume, setResume] = useState<ResumeData | null>(null)
   const [apps, setApps] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
+  const [autoApplying, setAutoApplying] = useState(false)
+  const [autoApplyResult, setAutoApplyResult] = useState<string | null>(null)
+
+  const fetchData = async () => {
+    try {
+      const [rRes, aRes] = await Promise.all([
+        api.get("/resume").catch(() => null),
+        api.get("/apply/history").catch(() => null),
+      ])
+      if (rRes?.data?.success) setResume(rRes.data.data)
+      if (aRes?.data?.success) setApps(aRes.data.data.slice(0, 5))
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [rRes, aRes] = await Promise.all([
-          api.get("/resume").catch(() => null),
-          api.get("/apply/history").catch(() => null),
-        ])
-        if (rRes?.data?.success) setResume(rRes.data.data)
-        if (aRes?.data?.success) setApps(aRes.data.data.slice(0, 5))
-      } catch {
-        // ignore
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchData()
   }, [])
+
+  const handleAutoApply = async () => {
+    setAutoApplying(true)
+    setAutoApplyResult(null)
+    try {
+      const res = await api.post("/smart-apply")
+      if (res.data.success) {
+        setAutoApplyResult(res.data.message)
+        await fetchData()
+      } else {
+        setAutoApplyResult("Auto-apply failed. Please try again.")
+      }
+    } catch {
+      setAutoApplyResult("Auto-apply failed. Please try again.")
+    } finally {
+      setAutoApplying(false)
+    }
+  }
 
   const atsScore = resume?.classification?.atsScore || 0
   const role = resume?.classification?.role || "—"
@@ -64,10 +86,37 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-muted-foreground mb-8">
-          Welcome back. Here is your activity at a glance.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome back. Here is your activity at a glance.
+            </p>
+          </div>
+          <button
+            onClick={handleAutoApply}
+            disabled={autoApplying}
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {autoApplying ? (
+              <>
+                <IconLoader2 className="h-4 w-4 animate-spin" />
+                Finding & Applying...
+              </>
+            ) : (
+              <>
+                <IconRocket className="h-4 w-4" />
+                Auto Find & Apply
+              </>
+            )}
+          </button>
+        </div>
+
+        {autoApplyResult && (
+          <div className="mb-6 rounded-lg bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary">
+            {autoApplyResult}
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
